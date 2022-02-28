@@ -20,6 +20,7 @@
     "homepage": "https://github.com/dhabita/dex-trade-api#readme",
     "dependencies": {
         "axios": "^0.26.0",
-        "crypto-js": "^4.1.1"
+        "crypto-js": "^4.1.1",
+        "web3": "^1.7.0"
     }
 }

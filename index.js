@@ -1,26 +1,223 @@
 var sha256 = require('crypto-js/sha256');
 const axios = require('axios');
-let api = "61b74128e12187a78d9df05c14f42726d35b217e31d19120a23fa5451d6e092e";
+let apiS = "d20ce7ae531d8f8629ae7e375a7676389fbf78ef005bce2a67c09a9fb7b9d2e6";
+let apiP = "fddb53e42b79a6535746a587af7c00cbac25e3b40bc12289284c8a5eac6c8bc4";
 
-let data = { "abc": "abc", "request_id": "123123123" };
 
-let hash = "abc" + "123123123" + api;
-const hased = sha256(hash).toString();
+const Web3 = require('web3');
+var serverbnb = "https://bsc-dataseed1.defibit.io/";
+const web3 = new Web3(new Web3.providers.HttpProvider(serverbnb));
 
-let headers = {
-    headers: {
-        'content-type': 'application/json',
-        'login-token': api,
-        'x-auth-sign': hased
+
+function del(id) {
+    let u = "https://api.dex-trade.com/v1/private/delete-order";
+
+    let tim = Date.now();
+    let data = { "order_id": id, "request_id": tim };
+
+    let hash = id + "" + tim + "" + apiS;
+
+    // console.log(hash);
+    const hased = sha256(hash).toString();
+
+    let headers = {
+        headers: {
+            'content-type': 'application/json',
+            'login-token': apiP,
+            'secret': apiS,
+            'x-auth-sign': hased
+        }
     }
+
+
+    axios.post(u, data, headers)
+        .then(function(response) {
+
+
+
+        })
+        .catch(function(error) {
+            console.log(error);
+        });
+
 }
 
 
 
-axios.post('https://api.dex-trade.com/v1/private/orders', data, headers)
-    .then(function(response) {
-        console.log(response);
-    })
-    .catch(function(error) {
+let getrate = async function(c = '0x14e5c9b5cb59d2af6d121bbf5a322c6fe9f18657') {
+
+
+    var abi = [{ "constant": true, "inputs": [], "name": "getReserves", "outputs": [{ "internalType": "uint112", "name": "_reserve0", "type": "uint112" }, { "internalType": "uint112", "name": "_reserve1", "type": "uint112" }, { "internalType": "uint32", "name": "_blockTimestampLast", "type": "uint32" }], "payable": false, "stateMutability": "view", "type": "function" }];
+
+    try {
+
+        var contract = new web3.eth.Contract(abi, c);
+
+        let a = await contract.methods.getReserves().call().then(function(resp) {
+            return resp[0] / resp[1];
+
+        });
+        return a;
+    } catch (error) {
         console.log(error);
-    });
+
+    }
+
+
+}
+
+
+async function ord() {
+
+    let rat = await getrate();
+
+    if (rat > 0) {} else return;
+
+    let tim = Date.now();
+    let data = { "request_id": tim };
+
+    let hash = tim + "" + apiS;
+
+    // console.log(hash);
+    const hased = sha256(hash).toString();
+
+    let headers = {
+        headers: {
+            'content-type': 'application/json',
+            'login-token': apiP,
+            'secret': apiS,
+            'x-auth-sign': hased
+        }
+    }
+    let PAIR = "NBGUSDT";
+    let countb = 0;
+    let counts = 0;
+    let firstb = 0;
+    let firsts = 0;
+
+    axios.post('https://api.dex-trade.com/v1/private/orders', data, headers)
+        .then(function(response) {
+
+            let orders = response.data.data.list;
+            orders.forEach(e => {
+                if (e.pair != PAIR) return;
+
+                let f = {
+                    id: e.id,
+                    pair: e.pair,
+                    price: e.rate,
+                    trade: e.type
+                }
+
+                if (f.trade == 0) {
+                    countb++;
+                    if (firstb == 0) firstb = f.id;
+                    firstb = Math.min(firstb, f.id);
+                }
+                if (f.trade == 1) {
+                    counts++;
+                    if (firsts == 0) firsts = f.id;
+                    firsts = Math.min(firsts, f.id);
+                }
+
+                // console.log(f);
+                //  console.log(e);
+
+            });
+            // console.log(order);
+
+            console.log(countb, firstb);
+            console.log(counts, firsts);
+
+            if (counts < 20) order(PAIR, rat, 50 * Math.random(), 1);
+            else
+                del(firsts);
+
+            if (countb < 20) order(PAIR, rat, 50 * Math.random(), 0);
+            else
+                del(firstb);
+
+
+        })
+        .catch(function(error) {
+            console.log(error);
+        });
+
+}
+
+
+
+
+let order = function(symbol, price, am, orderp) {
+
+    if (orderp == 0) {
+        price = price * 0.01 * (102 - Math.random() * 20);
+        price = price.toFixed(5) * 1;
+    }
+
+    if (orderp == 1) {
+        price = price * 0.01 * (97 + Math.random() * 20);
+        price = price.toFixed(5) * 1;
+    }
+
+    am = am / price;
+    am = am.toFixed(3) * 1;
+
+    let PAIR = symbol;
+    let PRICE = price;
+    let tim = Date.now();
+    let TYPE = orderp;
+    let VOLUME = am;
+
+
+    let data = {
+        "pair": PAIR,
+        "rate": PRICE,
+        "request_id": tim,
+        "type": TYPE,
+        "type_trade": 0,
+        "volume": am
+    };
+
+    console.log(data);
+
+
+    let hash = PAIR + "" + PRICE + "" + tim + TYPE + "0" + VOLUME + apiS;
+    const hased = sha256(hash).toString();
+
+    let headers = {
+        headers: {
+            'content-type': 'application/json',
+            'login-token': apiP,
+            'secret': apiS,
+            'x-auth-sign': hased
+        }
+    }
+
+    axios.post('https://api.dex-trade.com/v1/private/create-order', data, headers)
+        .then(function(response) {
+
+
+            console.log(response.data);
+
+
+        })
+        .catch(function(error) {
+            console.log(error);
+        });
+
+}
+
+
+
+// function op() {
+//     let symbol = "NBGUSDT";
+
+//     order(symbol, 1.4, 20 * Math.random(), 1);
+//     order(symbol, 1.5, 20 * Math.random(), 0);
+// }
+
+
+setInterval(ord, 10000);
+
+ord();
