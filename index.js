@@ -1,7 +1,10 @@
 var sha256 = require('crypto-js/sha256');
 const axios = require('axios');
-let apiS = "d20ce7ae531d8f8629ae7e375a7676389fbf78ef005bce2a67c09a9fb7b9d2e6";
-let apiP = "fddb53e42b79a6535746a587af7c00cbac25e3b40bc12289284c8a5eac6c8bc4";
+require('dotenv').config();
+
+
+let apiS = process.env.apiS;
+let apiP = process.env.apiP;
 
 
 const Web3 = require('web3');
@@ -66,12 +69,23 @@ let getrate = async function(c = '0x14e5c9b5cb59d2af6d121bbf5a322c6fe9f18657') {
 
 }
 
+let LAST_PRICE = 0;
 
 async function ord() {
 
-    let rat = await getrate();
+    let ratt = await getrate();
 
-    if (rat > 0) {} else return;
+
+    if (ratt > 0) {} else return;
+
+    let rat = LAST_PRICE;
+    if (rat == 0) rat = ratt;
+    else
+
+        rat = rat + (ratt - rat) * 0.1;
+    LAST_PRICE = rat;
+
+    console.log("Pancake price ", rat);
 
     let tim = Date.now();
     let data = { "request_id": tim };
@@ -129,11 +143,13 @@ async function ord() {
             console.log(countb, firstb);
             console.log(counts, firsts);
 
-            if (counts < 20) order(PAIR, rat, 50 * Math.random(), 1);
+
+
+            if (counts < 25) order(PAIR, rat, 50 * Math.random(), 1);
             else
                 del(firsts);
 
-            if (countb < 20) order(PAIR, rat, 50 * Math.random(), 0);
+            if (countb < 25) order(PAIR, rat, 50 * Math.random(), 0);
             else
                 del(firstb);
 
@@ -151,12 +167,12 @@ async function ord() {
 let order = function(symbol, price, am, orderp) {
 
     if (orderp == 0) {
-        price = price * 0.01 * (102 - Math.random() * 20);
+        price = price * 0.01 * (101 - Math.random() * 20);
         price = price.toFixed(5) * 1;
     }
 
     if (orderp == 1) {
-        price = price * 0.01 * (97 + Math.random() * 20);
+        price = price * 0.01 * (99 + Math.random() * 20);
         price = price.toFixed(5) * 1;
     }
 
