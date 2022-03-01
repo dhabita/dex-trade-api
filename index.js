@@ -167,12 +167,12 @@ async function ord() {
 let order = function(symbol, price, am, orderp) {
 
     if (orderp == 0) {
-        price = price * 0.01 * (101 - Math.random() * 20);
+        price = price * 0.01 * (101 - Math.random() * 5);
         price = price.toFixed(5) * 1;
     }
 
     if (orderp == 1) {
-        price = price * 0.01 * (99 + Math.random() * 20);
+        price = price * 0.01 * (99 + Math.random() * 5);
         price = price.toFixed(5) * 1;
     }
 
