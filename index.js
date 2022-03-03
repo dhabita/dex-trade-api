@@ -176,7 +176,7 @@ let order = function(symbol, price, am, orderp) {
     if (orderp == 0) {
         price = price * 0.01 * (101 - Math.random() * 5);
         price = price.toFixed(5) * 1;
-        if(Math.random()<0.8) price = Math.min(price,ask);
+        if(Math.random()<0.5) price = Math.max(price,bid);
     }
 
     if (orderp == 1) {
