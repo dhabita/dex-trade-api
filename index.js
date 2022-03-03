@@ -71,6 +71,9 @@ let getrate = async function(c = '0x14e5c9b5cb59d2af6d121bbf5a322c6fe9f18657') {
 
 let LAST_PRICE = 0;
 
+let ask = 0;
+let bid =0;
+
 async function ord() {
 
     let ratt = await getrate();
@@ -108,6 +111,8 @@ async function ord() {
     let counts = 0;
     let firstb = 0;
     let firsts = 0;
+      ask = 0;
+      bid =0;
 
     axios.post('https://api.dex-trade.com/v1/private/orders', data, headers)
         .then(function(response) {
@@ -125,13 +130,15 @@ async function ord() {
 
                 if (f.trade == 0) {
                     countb++;
-                    if (firstb == 0) firstb = f.id;
+                    if (firstb == 0) { firstb = f.id; ask=f.price*1;}
                     firstb = Math.min(firstb, f.id);
+                    ask = Math.max(ask,f.price*1);
                 }
                 if (f.trade == 1) {
                     counts++;
-                    if (firsts == 0) firsts = f.id;
+                    if (firsts == 0) { firsts = f.id; bid =f.price*1;}
                     firsts = Math.min(firsts, f.id);
+                    bid = Math.max(bid,f.price*1);
                 }
 
                 // console.log(f);
@@ -145,11 +152,11 @@ async function ord() {
 
 
 
-            if (counts < 25) order(PAIR, rat, 50 * Math.random(), 1);
+            if (counts < 25) order(PAIR, rat, 70 * Math.random(), 1);
             else
                 del(firsts);
 
-            if (countb < 25) order(PAIR, rat, 50 * Math.random(), 0);
+            if (countb < 25) order(PAIR, rat, 70 * Math.random(), 0);
             else
                 del(firstb);
 
@@ -169,11 +176,14 @@ let order = function(symbol, price, am, orderp) {
     if (orderp == 0) {
         price = price * 0.01 * (101 - Math.random() * 5);
         price = price.toFixed(5) * 1;
+        if(Math.random()<0.8) price = Math.min(price,ask);
     }
 
     if (orderp == 1) {
         price = price * 0.01 * (99 + Math.random() * 5);
         price = price.toFixed(5) * 1;
+
+      
     }
 
     am = am / price;
