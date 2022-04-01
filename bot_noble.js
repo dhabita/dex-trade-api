@@ -1,6 +1,5 @@
 var sha256 = require('crypto-js/sha256');
 const axios = require('axios');
-const c = require('./bot_noble');
 require('dotenv').config();
 
 
@@ -36,8 +35,8 @@ function del(id) {
 
     axios.post(u, data, headers)
         .then(function(response) {
-            console.log(id);
-            console.log(response.data);
+
+
 
         })
         .catch(function(error) {
@@ -77,7 +76,7 @@ let bid = 0;
 
 async function ord() {
 
-    let ratt = await getrate();
+    let ratt = 0.00000033; //await getrate();
 
 
     if (ratt > 0) {} else return;
@@ -107,7 +106,7 @@ async function ord() {
             'x-auth-sign': hased
         }
     }
-    let PAIR = "NBGUSDT";
+    let PAIR = "NOBLEUSDT";
     let countb = 0;
     let counts = 0;
     let firstb = [];
@@ -158,20 +157,22 @@ async function ord() {
             // console.log(firsts);
 
 
-
-            if (counts < 25) order(PAIR, rat, 70 * Math.random(), 1);
+            if (counts < 25) order(PAIR, rat, Math.floor(Math.random() * 20), 1);
             else
                 del(firsts[Math.floor(Math.random() * firsts.length)]);
 
-            if (countb < 25) order(PAIR, rat, 70 * Math.random(), 0);
+            if (countb < 25) order(PAIR, rat, Math.floor(Math.random() * 20), 0);
             else
                 del(firstb[Math.floor(Math.random() * firstb.length)]);
+
 
 
         })
         .catch(function(error) {
             console.log(error);
         });
+
+
 
 }
 
@@ -182,20 +183,20 @@ let order = function(symbol, price, am, orderp) {
 
     if (orderp == 0) {
         price = price * 0.01 * (101 - Math.random() * 5);
-        price = price.toFixed(5) * 1;
+        price = price.toFixed(12);
         if (bid < price)
             if (Math.random() < 0.5) price = Math.max(price, bid);
     }
 
     if (orderp == 1) {
         price = price * 0.01 * (99 + Math.random() * 5);
-        price = price.toFixed(5) * 1;
+        price = price.toFixed(12);
 
 
     }
 
-    am = am / price;
-    am = am.toFixed(3) * 1;
+    am = Math.floor(am / price * 0.0001) * 10000;
+    am = am.toFixed(0) * 1;
 
     let PAIR = symbol;
     let PRICE = price;
