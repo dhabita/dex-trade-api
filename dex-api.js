@@ -159,11 +159,11 @@ async function ord() {
 
 
 
-            if (counts < 25) order(PAIR, rat, 70 * Math.random() + 50, 1);
+            if (counts < 15) order(PAIR, rat, 70 * Math.random() + 50, 1);
             else
                 del(firsts[Math.floor(Math.random() * firsts.length)]);
 
-            if (countb < 25) order(PAIR, rat, 70 * Math.random() + 50, 0);
+            if (countb < 15) order(PAIR, rat, 70 * Math.random() + 50, 0);
             else
                 del(firstb[Math.floor(Math.random() * firstb.length)]);
 
