@@ -217,6 +217,7 @@ let order = function(symbol, price, am, orderp) {
     console.log(data);
 
 
+    if (am <= 0) return;
     let hash = PAIR + "" + PRICE + "" + tim + TYPE + "0" + VOLUME + apiS;
     const hased = sha256(hash).toString();
 
