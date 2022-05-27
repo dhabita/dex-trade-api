@@ -157,11 +157,11 @@ async function ord() {
             // console.log(firsts);
 
 
-            if (counts < 15) order(PAIR, rat, Math.floor(Math.random() * 50), 1);
+            if (counts < 10) order(PAIR, rat, Math.floor(Math.random() * 20), 1);
             else
                 del(firsts[Math.floor(Math.random() * firsts.length)]);
 
-            if (countb < 15) order(PAIR, rat, Math.floor(Math.random() * 50), 0);
+            if (countb < 10) order(PAIR, rat, Math.floor(Math.random() * 20), 0);
             else
                 del(firstb[Math.floor(Math.random() * firstb.length)]);
 
